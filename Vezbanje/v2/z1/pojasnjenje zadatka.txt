@@ -1,0 +1,4 @@
+Na klijentskoj strani se radi hex hesovanje i konkatenacija i ponovno hex hesovanje rezultata konkatenacije izmedju native lozinke
+i nounce vrednosti dobijene od servera. Na server se salje taj rezultat iz klijenta i tamo se radi isto i onda se poredi rezultat
+dobijen iz klijenta sa rezultatom koji se izracunao na serveru
+*na serveru vec imamo hesovanu lozinku i generisan nounce (random niz bajtova od 4 elementa), dok na klijentu racunamo njenu hes vrednost

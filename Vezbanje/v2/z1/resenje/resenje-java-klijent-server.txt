@@ -1,0 +1,104 @@
+[2:31 PM] Saša Adamović
+
+
+
+
+public class Klijent_auth_hash {
+
+
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+
+        String serverName ="localhost";
+
+        int port = 8088;
+
+        String lozinka = "d13s1as4dasd";
+
+
+        System.out.println("Konekcija na "+serverName+" port "+port);
+
+        Socket klijent = new Socket(serverName, port);
+
+        System.out.println("Konekcija uspesna: "+klijent.getRemoteSocketAddress());
+
+
+        DataInputStream in = new DataInputStream(klijent.getInputStream());
+
+        DataOutputStream out = new DataOutputStream(klijent.getOutputStream());
+
+        //prorokol
+
+        System.out.println("Unesite korisnicko ime:");
+
+        String korisnickoIme = new Scanner(System.in).nextLine();
+
+        out.writeUTF(korisnickoIme);
+
+        String n = in.readUTF();
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+        String hes_lozinka = Hex.toHexString(md.digest(lozinka.getBytes()));
+
+        String hes_lozinka_n = hes_lozinka+n;
+
+        md.reset();
+
+        String odgovor = Hex.toHexString(md.digest(hes_lozinka_n.getBytes()));
+
+        out.writeUTF(odgovor);
+
+        System.out.println(in.readUTF());
+
+        //
+
+        in.close();out.close();
+
+        klijent.close();
+
+    }
+
+
+}
+
+
+
+
+
+public class Server_auth_hash {
+
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+        int port = 8088;
+        ServerSocket serverSocket = new ServerSocket(port);
+        //hardkodovati lozinku
+        String hes_lozinka = "a422bd02f90a9072a881d6ad63e2862ee9f81189ae061da0238cd77442f6aed7";
+
+        while(true){
+            Socket server = serverSocket.accept();
+            DataInputStream in = new DataInputStream(server.getInputStream());
+            DataOutputStream out = new DataOutputStream(server.getOutputStream());
+            //protokol
+            String korisnickoIme = in.readUTF();
+            System.out.println("Zahtev za autentifikaciju: "+korisnickoIme);
+            //generisanje izazova - 4 bajta slucajno generisana
+            byte []n = new byte[4];
+            new Random().nextBytes(n);
+            //server salje vrednost n
+            out.writeUTF(Hex.toHexString(n));
+            String odgovor = in.readUTF();
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String hes_lozinka_n = hes_lozinka + Hex.toHexString(n);
+            String ocekivani_odgovor = Hex.toHexString(md.digest(hes_lozinka_n.getBytes()));
+            if(odgovor.equals(ocekivani_odgovor)){
+                System.out.println("Autentifikacija je uspesna za korisnika "+korisnickoIme);
+                out.writeUTF("Autentifikacija je uspesna za korisnika "+korisnickoIme);
+            }else{
+                out.writeUTF("Autentifikacija neuspesna - pogresna lozinka!");
+                System.out.println("Autentifikacija neuspesna - pogresna lozinka!");
+            }
+            in.close();out.close();
+            server.close();
+        }
+    }
+
+}

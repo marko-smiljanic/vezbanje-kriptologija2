@@ -1,0 +1,5 @@
+Razviti kriptosistem izmedju Alise i Boba. 
+Koristiti mrezne komponente.
+Sifarski algoritam AES/CBC/PKCS7
+Komunikacija u dupleksu.
+Alisa i Bob unapred imaju razmenjen simetricni kljuc.

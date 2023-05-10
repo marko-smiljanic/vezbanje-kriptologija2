@@ -1,0 +1,60 @@
+def caesar_decrypt(ciphertext):
+    freq = {}
+    for c in ciphertext:
+        if c in freq:
+            freq[c] += 1
+        else:
+            freq[c] = 1
+    max_count = 0
+    max_char = ''
+    for c in freq:
+        if freq[c] > max_count:
+            max_count = freq[c]
+            max_char = c
+    key = ord(max_char) - ord('e')
+    plaintext = ''
+    for c in ciphertext:
+        if c.isalpha():
+            shifted = ord(c) - key
+            if shifted < ord('a'):
+                shifted += 26
+            plaintext += chr(shifted)
+        else:
+            plaintext += c
+    return plaintext
+
+
+Ova implementacija koristi funkciju ord za pretvaranje slova u ASCII vrijednost i obrnuto, te petlje za prolazak kroz šifrirani tekst i računanje frekvencije pojavljivanja svakog slova. 
+Nakon pronalaska slova koje se najčešće pojavljuje, 
+izračunava se pomak i primjenjuje se na svako slovo u šifriranom tekstu.
+
+
+
+from Crypto.Cipher import AES
+
+# Šifrirani tekst i stariji ključevi
+ciphertext = b'\x89\x5f\x82\x31\xfb\x0e\x60\x99\x1d\x43\x32\x16\x74\x3f\xe8\x55'
+old_key1 = b'\x00'*16
+old_key2 = b'\xff'*16
+
+# Generiranje novijeg ključa iz starijih ključeva
+new_key = bytes([a ^ b ^ c for a, b, c in zip(ciphertext, old_key1, old_key2)])
+
+# Dekriptiranje šifriranog teksta s novim ključem
+cipher = AES.new(new_key, AES.MODE_ECB)
+plaintext = cipher.decrypt(ciphertext)
+print(plaintext)
+
+
+Napad na ključeve snižavanjem razine (key-reduction attack): Ovaj napad se temelji na ideji da se ključevi mogu 
+generirati iz starijih ključeva primjenom određenih operacija, poput XOR-a. Ako napadač može dobiti nekoliko starijih 
+ključeva, 
+može primijeniti te operacije kako bi došao do novijih ključeva i tako dešifrirao šifrirane podatke.
+Primjer implementacije: Ovaj napad se može implementirati u Pythonu pomoću biblioteke PyCryptodome. 
+Prvo, napadač mora dobiti nekoliko starijih ključeva. Zatim, može primijeniti XOR operacije kako bi došao do 
+novijih ključeva i tako dešifrirao šifrirane podatke. Primjer koda:
+
+
+Kriptoanaliza za Advanced Encryption Standard (AES) može biti vrlo složena i uključuje razne tehnike, 
+uključujući napade na ključeve, napade na implementaciju i napade na strukturu algoritma. 
+Ovdje ću navesti nekoliko primjera napada na AES, zajedno s kratkim opisom i primjerima implementacije:
